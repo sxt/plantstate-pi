@@ -5,6 +5,25 @@ import digitalio
 import board
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
+import requests
+import json
+import sys
+import logging
+
+post_url = 'https://sxt-plantstate.us-e2.cloudhub.io/plantstate/events'
+
+plant = 1
+
+def send_message(event_type, usr, pwd):
+
+        body = {"event": {"plantId":plant, "eventTypeId":event_type}} 
+        body_json = json.dumps(body)
+        r = requests.post(post_url, body_json, headers={"Content-type":"application/json"}, auth=(usr, pwd))
+
+        if r.status_code != 200:
+           print ("Failed to send message. Status code = " + str(r.status_code) + " text = " + r.text)
+        else:
+           print ("Sent message successfully")
 
 def remap_range(value, left_min, left_max, right_min, right_max):
     # this remaps a value from original (left) range to new (right) range
@@ -18,6 +37,14 @@ def remap_range(value, left_min, left_max, right_min, right_max):
     # Convert the 0-1 range into a value in the right range.
     return int(right_min + (valueScaled * right_span))
 
+#--------
+
+if len(sys.argv) < 3:
+  logging.error( "Must supply API client id & secret")
+  sys.exit(1)
+
+usr = sys.argv[1]
+pwd = sys.argv[2]
 
 # Assuming range 0-100:
 moisture_threshold  = 50
@@ -45,11 +72,11 @@ level = remap_range(chan0.value, 0, 65535, 0, 100)
 if level < moisture_threshold:
    is_dry = True
    print('Plant is dry')
-   # Send Message: dry
+   send_message(3, usr, pwd)
 else:
    is_dry = False
    print('Plant is OK')
-   # Send Message: ok
+   send_message(3, usr, pwd)
 
 last_read = 0       # this keeps track of the last potentiometer value
 tolerance = 250     # to keep from being jittery we'll only change
