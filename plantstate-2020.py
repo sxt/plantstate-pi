@@ -72,11 +72,11 @@ level = remap_range(chan0.value, 0, 65535, 0, 100)
 if level < moisture_threshold:
    is_dry = True
    print('Plant is dry')
-   send_message(3, usr, pwd)
+   send_message(1, usr, pwd)
 else:
    is_dry = False
    print('Plant is OK')
-   send_message(3, usr, pwd)
+   send_message(2, usr, pwd)
 
 last_read = 0       # this keeps track of the last potentiometer value
 tolerance = 250     # to keep from being jittery we'll only change
@@ -101,19 +101,19 @@ while True:
         # convert 16bit adc0 (0-65535) trim pot read into 0-100 volume level
         level = remap_range(trim_pot, 0, 65535, 0, 100)
 
-        # set OS volume playback volume
-
         # Has the moisture level gone below the warning threshold?
         if level < moisture_threshold:
             if is_dry is False:
                is_dry = True
                print('Plant is dry')
                # Send Message: dry
+               send_message(1, usr, pwd)
         else:
             if is_dry is True:
                is_dry = False
                print('Plant is OK')
                # Send Message: ok
+               send_message(2, usr, pwd)
 
         # save the potentiometer reading for the next loop
         last_read = trim_pot
