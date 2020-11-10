@@ -46,8 +46,8 @@ if len(sys.argv) < 3:
 usr = sys.argv[1]
 pwd = sys.argv[2]
 
-# Assuming range 0-100:
-moisture_threshold  = 50
+# Assuming range 0-100. 6 seems to be a good number.
+moisture_threshold  = 6
 is_dry = False
 
 # create the spi bus
@@ -67,6 +67,7 @@ print('ADC Voltage: ' + str(chan0.voltage) + 'V')
 
 # convert 16bit adc0 (0-65535) trim pot read into 0-100 volume level
 level = remap_range(chan0.value, 0, 65535, 0, 100)
+print('Normalized level: ' + str(level))
 
 # Has the moisture level gone below the warning threshold?
 if level < moisture_threshold:
@@ -100,6 +101,7 @@ while True:
     if trim_pot_changed:
         # convert 16bit adc0 (0-65535) trim pot read into 0-100 volume level
         level = remap_range(trim_pot, 0, 65535, 0, 100)
+        print('Normalized level: ' + str(level))
 
         # Has the moisture level gone below the warning threshold?
         if level < moisture_threshold:
